@@ -1,8 +1,4 @@
-# 🤖 AI AGENTS FOR TRADING
-
-<p align="center">
-  <a href="https://www.moondev.com/"><img src="moondev.png" width="300" alt="Moon Dev"></a>
-</p>
+# 🤖 QUANT AGENTS
 
 This project explores the potential of [artificial financial intelligence](https://www.afi.xyz) - a focused implementation of AI for trading and investing research.
 
