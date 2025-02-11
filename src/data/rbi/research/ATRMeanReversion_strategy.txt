@@ -1,30 +1,24 @@
-STRATEGY_NAME: ATR MeanReversion
+STRATEGY_NAME: AtrMeanReversion
 
 STRATEGY_DETAILS:
 
-This strategy focuses on mean reversion using Kelter Channels and Average True Range (ATR) to identify overextended instruments and manage position sizing. Mean reversion is a natural part of the market where large moves in price tend to reverse towards an average price. The strategy aims to trade instruments with an imbalance, either in momentum or mean reversion tendency, rather than trading during equilibrium.
+This strategy focuses on mean reversion, using Average True Range (ATR) to identify overextended instruments and Keltner Channels as a tool for detecting potential mean reversion trades. The primary approach is to find an overextended market based on ATR and then look for a reversal setup within the Keltner Channels.
 
-KEY STRATEGY COMPONENTS:
-1. Mean reversion: Trading against the trend when the market is overextended.
-2. Kelter Channels: Identifying overextended instruments based on standard deviation from an average price.
-3. ATR: Managing position sizing and risk.
+1. Key strategy components:
+   - Average True Range (ATR) to identify overextended markets.
+   - Keltner Channels for detecting potential mean reversion trades.
+   - 2B price pattern as a reversal setup.
 
-ENTRY RULES:
-1. Identify an instrument with a significant momentum move.
-2. Wait for price to poke outside the upper or lower Kelter channel.
-3. Look for a reversal candlestick pattern (e.g., bullish engulfing or bearish engulfing).
-4. Place a sell stop order below the reversal candle for short trades or a buy stop order above the reversal candle for long trades.
+2. Entry/exit rules:
+   - Enter a short position when price breaks the high of a reversal candlestick within the Keltner Channel, placing a protective stop loss just beyond the high of the reversal candle.
+   - Exit the position when price continues in the trend direction, moving beyond the protective stop loss.
 
-EXIT RULES:
-1. Set a protective stop loss beyond the high of the reversal candle (for short trades) or the low of the reversal candle (for long trades).
-2. Close the position when price moves in the desired direction (trend) and breaks the high or low of the reversal candle.
+3. Risk management:
+   - Consider using half of your normal size for these trades since there might be another poke above or below as different time frames react to the event.
+   - Expect the first position to be a loss; it isn't always a loss, but it can be.
 
-RISK MANAGEMENT:
-1. Use half of your normal position size for these trades, as there might be another poke above or below the channel due to different time frames reacting to the event.
-2. Expect the first position to be a loss, but be prepared to profit from subsequent positions if the setup presents again.
+4. Required indicators:
+   - ATR
+   - Keltner Channels
 
-REQUIRED INDICATORS:
-1. Kelter Channels (20-period, multiplier of 2.5)
-2. Average True Range (ATR)
-
-This strategy combines mean reversion with specific entry, exit, and risk management rules using Kelter Channels and ATR. The unique aspect of this strategy is its use of ATR for position sizing and risk management, making it an ATR MeanReversion strategy.
+The AtrMeanReversion strategy relies on the understanding of two forces in the market: momentum and mean reversion. The trader should be able to identify these forces and scan for events that could offer good gains. By studying hundreds of charts and defining a plan based on the learned similarities between stalled and successful setups, traders can improve their performance.

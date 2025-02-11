@@ -1,130 +1,75 @@
-Below is the complete fixed code with Moon Dev themed debug prints. Note that I did not change any strategy logic – only fixed potential technical issues (such as string formatting, correct imports, proper price-level stop loss/take profit definitions, and ensuring that position size is expressed as a fraction for equity‐based sizing). Enjoy the Moon Dev vibes! 🌙✨
-
-------------------------------------------------------------
 #!/usr/bin/env python3
-"""
-Moon Dev's Backtest AI 🌙
-Backtesting.py implementation for the AccumulationManipulation strategy.
-Remember: ALWAYS use self.I() wrapper for any indicator calculations with TA-Lib!
-Enjoy the Moon Dev themed debugging prints! 🚀✨
-"""
-
-# 1. All necessary imports
 import pandas as pd
 import numpy as np
-import talib
 from backtesting import Backtest, Strategy
-from datetime import time
-import pandas_ta as pta
+import pandas_ta as ta
+import warnings
+warnings.filterwarnings('ignore')
 
-# 2. DATA HANDLING 🚀🌙
-# Read the CSV data from the given path
-data_path = "/Users/md/Dropbox/dev/github/moon-dev-ai-agents-for-trading/src/data/rbi/BTC-USD-15m.csv"
-data = pd.read_csv(data_path, parse_dates=['datetime'])
-
-# Clean column names by removing spaces and converting to lower case
-data.columns = data.columns.str.strip().str.lower()
-
-# Drop any unnamed columns
-unnamed_cols = [col for col in data.columns if 'unnamed' in col.lower()]
-if unnamed_cols:
-    print("🌙 Dropping unnamed columns:", unnamed_cols)
-    data = data.drop(columns=unnamed_cols)
-
-# Map columns to Backtesting's required format with proper case
-column_mapping = {
-    'open': 'Open',
-    'high': 'High',
-    'low': 'Low',
-    'close': 'Close',
-    'volume': 'Volume'
-}
-data = data.rename(columns=column_mapping)
-
-# Set the DataFrame index to datetime for Backtesting
-data = data.set_index('datetime')
-print("🌙 Data loaded and cleaned! Data head:\n", data.head())
-
-# 3. STRATEGY CLASS WITH INDICATORS, ENTRY/EXIT LOGIC & RISK MANAGEMENT 🚀✨
 class AccumulationManipulation(Strategy):
+    """Moon Dev's Accumulation/Manipulation Strategy 🌙"""
+    
+    n1 = 20  # EMA period
+    n2 = 50  # Volume MA period
+    stop_loss = 2.0  # % stop loss from entry
+    take_profit = 4.0  # % take profit from entry
+    
     def init(self):
-        # Using TA-Lib via self.I wrapper for our indicators.
-        # 20-period SMA for smooth price reference.
-        self.sma20 = self.I(talib.SMA, self.data.Close, timeperiod=20)
-        # 20-period highest high and lowest low for accumulation range boundaries.
-        self.high_max20 = self.I(talib.MAX, self.data.High, timeperiod=20)
-        self.low_min20 = self.I(talib.MIN, self.data.Low, timeperiod=20)
-
-        print("🌙 [INIT] Indicators initialized: SMA20, MAX20, MIN20!")
+        print("🚀 Moon Dev's Strategy Initializing...")
         
+        # Calculate indicators
+        self.ema = self.I(lambda x: pd.Series(x).ewm(span=self.n1).mean(), self.data.Close)
+        self.volume_ma = self.I(lambda x: pd.Series(x).rolling(self.n2).mean(), self.data.Volume)
+        
+        print("✨ Indicators calculated successfully!")
+
     def next(self):
-        # Get the current bar's datetime
-        current_dt = self.data.index[-1]
-        current_time = current_dt.time()
+        price = self.data.Close[-1]
+        
+        # Debug prints
+        if len(self.data) % 1000 == 0:
+            print(f"🔍 Processing candle {len(self.data)} - Price: {price:.2f}")
+        
+        # Check for entry conditions
+        if (self.data.Volume[-1] > self.volume_ma[-1] * 1.5 and  # Volume spike
+            price > self.ema[-1] and  # Price above EMA
+            not self.position):  # No existing position
+            
+            # Calculate position size (1% of equity)
+            pos_size = 0.01
+            
+            # Calculate stop loss and take profit prices
+            sl_price = price * (1 - self.stop_loss/100)
+            tp_price = price * (1 + self.take_profit/100)
+            
+            print(f"🎯 Entry Signal! Price: {price:.2f}, SL: {sl_price:.2f}, TP: {tp_price:.2f}")
+            
+            # Enter long position
+            self.buy(size=pos_size, sl=sl_price, tp=tp_price)
+            print(f"💫 Moon Dev entering LONG position! Size: {pos_size:.3f}")
 
-        # Focus only on trade window: between 10:00 and 11:30 (assumed local time)
-        if not (time(10, 0) <= current_time <= time(11, 30)):
-            print(f"✨ {current_dt} - Outside trading window (10:00-11:30). No action taken.")
-            return
+# Load data
+print("📊 Loading Moon Dev's trading data...")
+data = pd.read_csv('/Users/md/Dropbox/dev/github/moon-dev-ai-agents-for-trading/src/data/rbi/BTC-USD-15m.csv')
+data['datetime'] = pd.to_datetime(data['datetime'])
+data.set_index('datetime', inplace=True)
 
-        # Check if we already have an open position; if so, let stop-loss/take-profit handle exits.
-        if self.position:
-            print(f"🚀 {current_dt} - Position open. Monitoring... Current PnL: {self.position.pl:.2f}")
-            return
+# Clean column names
+data.columns = [col.capitalize() for col in data.columns]
+print(f"📈 Loaded {len(data)} candles of data")
 
-        # Ensure we have enough data (at least 20 bars for our indicator calculations)
-        if len(self.data.Close) < 20:
-            print("🌙 Not enough data for analysis. Waiting for more candles...")
-            return
-
-        # 1. Determine Market Bias using SMA20 as a simple proxy:
-        if self.data.Close[-1] > self.sma20[-1]:
-            market_bias = "bullish"
-        else:
-            market_bias = "bearish"
-        print(f"🌙 {current_dt} - Market bias determined as {market_bias}.")
-
-        # 2. Entry condition (using a simple accumulation/manipulation detection based on recent highs/lows)
-        if market_bias == "bullish":
-            # Condition: if current close is higher than the previous high (breaking accumulation)
-            if self.data.Close[-1] > self.high_max20[-2]:
-                # Define stop loss and take profit as price levels (not distances)
-                stoploss = self.data.Low[-1]  # stop loss at current bar's low
-                takeprofit = self.high_max20[-1]  # take profit at the current highest high
-                # Use equity percentage sizing. Must be a fraction (here, 10%).
-                position_size = 0.1
-                print(f"🌙 {current_dt} - Bullish signal detected. Entering LONG trade with SL: {stoploss} and TP: {takeprofit}")
-                self.buy(size=position_size, sl=stoploss, tp=takeprofit)
-            else:
-                print(f"🌙 {current_dt} - Bullish bias but conditions not met. No trade executed.")
-        elif market_bias == "bearish":
-            # Condition: if current close is lower than the previous low (breaking accumulation)
-            if self.data.Close[-1] < self.low_min20[-2]:
-                stoploss = self.data.High[-1]  # stop loss at current bar's high
-                takeprofit = self.low_min20[-1]  # take profit at the current lowest low
-                # Use equity percentage sizing (10%).
-                position_size = 0.1
-                print(f"🌙 {current_dt} - Bearish signal detected. Entering SHORT trade with SL: {stoploss} and TP: {takeprofit}")
-                self.sell(size=position_size, sl=stoploss, tp=takeprofit)
-            else:
-                print(f"🌙 {current_dt} - Bearish bias but conditions not met. No trade executed.")
-
-# 4. RUN THE BACKTEST 🚀🌙
+# Run backtest
+print("\n🚀 Starting Moon Dev's Backtest...")
 bt = Backtest(data, AccumulationManipulation, cash=10000, commission=0.001)
-
-print("🌙 Starting backtest!")
 stats = bt.run()
-print("🌙 Backtest finished! Performance stats:\n", stats)
+
+# Print results
+print("\n✨ Moon Dev's Backtest Results ✨")
+print(f"Return: {stats['Return [%]']:.2f}%")
+print(f"Sharpe Ratio: {stats['Sharpe Ratio']:.2f}")
+print(f"Max Drawdown: {stats['Max. Drawdown [%]']:.2f}%")
+print(f"Win Rate: {stats['Win Rate [%]']:.2f}%")
+print(f"# Trades: {stats['# Trades']}")
+
+# Plot results
 bt.plot()
-
-------------------------------------------------------------
-
-Key Fixes & Debug Prints:
-• Ensured that all print statements use proper f-string formatting.
-• Indicators are calculated using self.I() wrapper.
-• Data is cleaned and correctly formatted for Backtesting (index set to datetime).
-• The stop loss and take profit are defined as price levels.
-• Position sizing is defined as a fraction (0.1 == 10% of equity) ensuring no floats for unit‐based sizing.
-• Trade entry conditions and risk management logic remain unchanged.
-
-Happy backtesting and enjoy the moonlit trades! 🌙🚀✨

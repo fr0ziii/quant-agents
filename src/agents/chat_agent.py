@@ -43,13 +43,13 @@ load_dotenv(dotenv_path=env_path)
 
 # Model override settings
 MODEL_TYPE = "groq"  # Using Claude for chat responses
-MODEL_NAME = "llama-3.1-8b-instant"  # Fast, efficient model llama-3.1-8b-instant
+MODEL_NAME = "mixtral-8x7b-32768"  # Fast, efficient model llama-3.1-8b-instant
 
 # Configuration - All in one place! 🎯
 RESTREAM_CHECK_INTERVAL = 0.1  # Reduce to 100ms for more responsive chat
 CONFIDENCE_THRESHOLD = 0.8
 MAX_RETRIES = 3
-MAX_RESPONSE_TOKENS = 50  # Increase to allow longer responses
+MAX_RESPONSE_TOKENS = 30  # Increase to allow longer responses
 CHAT_MEMORY_SIZE = 30
 MIN_CHARS_FOR_RESPONSE = 3
 DEFAULT_INITIAL_CHATS = 10
@@ -87,6 +87,7 @@ Key points about Moon Dev:
 Knowledge Base:
 Frequently Asked Questions
 * when do you live stream? daily at 8am est
+* how do i start? learn everything you need to know here: algotradecamp.com
 * how you get point for bootcamp? what are points used for? the person with the most points at the end of each's days stream gets the algo trade camp for free for 1 month
 * what do points do? the person who gets the most points on the live stream gets the algo trade camp for free for a month
 * what is 777 peace and love. i believe you can have anything in this world if you lead with love, so while i share absolutely every line of code on youtube, i get a lot of negative energy thrown at me. its the only downside of sharing. sending a 777 is an easy way to send some good vibes to not only me, but everyone reading the comments. lead with love and kindness and you can have anything in this world. imo.
@@ -123,6 +124,8 @@ Frequently Asked Questions
 * can i pay for the bootcamp in crypto?yes, if you are looking to sign up for the lifetime package. unfortunately, there is no way to collect subscriptions in crypto so we do lifetime only. you can email moon@algotradecamp.com for the address to send crypto to set up your bootcamp account.
 * what is the thing you record your voice for text? what is the voice to text software yo uuse? its called flow pro it allows me to turn my voice to text to double my words per minute
 * whats your github? @moondevonyt
+
+ONLY RESPOND BASED IF THE ANSWER IS IN THE KNOWLEDGE BASE OR COMMMON KNOWLEDGE. OTHERWISE JUST SAY: ASK MOON DEV
 User message to respond to with the above knowledge base: {question}
 """
 
@@ -641,7 +644,7 @@ class ChatAgent:
         4. If not negative and no ?, just display the message
         """
         # Add API key warning
-        if any(key_word in question.lower() for key_word in ['api', 'key', 'token', 'secret']):
+        if any(key_word in question.lower() for key_word in ['apixxx', 'keyxxx', 'tokenxxx', 'secretxxx']):
             return None
             
         retries = 0
