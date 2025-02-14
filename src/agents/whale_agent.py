@@ -24,7 +24,7 @@ import openai
 from pathlib import Path
 from src import nice_funcs as n
 from src import nice_funcs_hl as hl  # Add import for hyperliquid functions
-from src.agents.api import MoonDevAPI
+from src.agents.api import fr0ziiAPI #fr0zii
 from collections import deque
 from src.agents.base_agent import BaseAgent
 import traceback
@@ -115,13 +115,13 @@ class WhaleAgent(BaseAgent):
                     api_key=deepseek_key,
                     base_url=DEEPSEEK_BASE_URL
                 )
-                print("🚀 Moon Dev's Whale Agent using DeepSeek override!")
+                print("🚀 fr0zii's Whale Agent using DeepSeek override!")
             else:
                 self.deepseek_client = None
                 print("⚠️ DEEPSEEK_KEY not found - DeepSeek model will not be available")
         else:
             self.deepseek_client = None
-            print(f"🎯 Moon Dev's Whale Agent using Claude model: {self.ai_model}!")
+            print(f"🎯 fr0zii's Whale Agent using Claude model: {self.ai_model}!")
         
         # Initialize Moon Dev API with correct base URL
         self.api = MoonDevAPI(base_url="http://api.moondev.com:8000")
@@ -549,7 +549,7 @@ class WhaleAgent(BaseAgent):
         except Exception as e:
             print(f"❌ Error in monitoring cycle: {str(e)}")
             print(f"Stack trace: {traceback.format_exc()}")
-            print("🔧 Moon Dev suggests checking the logs and trying again!")
+            print("🔧 fr0zii suggests checking the logs and trying again!")
             time.sleep(60)  # Sleep for 1 minute on error
             
     def _announce(self, message, is_whale=False):
@@ -666,7 +666,7 @@ if __name__ == "__main__":
     agent = WhaleAgent()
     
     # Run the agent continuously
-    print("\n🐋 Moon Dev's Whale Agent starting monitoring cycle...")
+    print("\n🐋 fr0zii's Whale Agent starting monitoring cycle...")
     while True:
         try:
             agent.run_monitoring_cycle()
@@ -677,4 +677,4 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"❌ Error in main loop: {str(e)}")
             print("🔧 Moon Dev suggests checking the logs and trying again!")
-            time.sleep(60)  # Sleep for 1 minute on error 
+            time.sleep(60)  # Sleep for 1 minute on error

@@ -4,7 +4,7 @@ import json
 import time
 from typing import Optional
 
-app = FastAPI(title="MoonDev's DeepSeek API 🌙")
+app = FastAPI(title="fr0zii's DeepSeek API 🌙")
 
 # Configuration
 OLLAMA_BASE_URL = "http://localhost:11434"
@@ -34,7 +34,7 @@ async def retry_request(func, *args, **kwargs) -> Optional[dict]:
             last_error = e
             print(f"❌ Attempt {attempt + 1} failed: {str(e)}")
             if attempt < MAX_RETRIES - 1:
-                print(f"🌙 Moon Dev says: Don't worry, we'll try again! 🚀")
+                print(f"🌙 fr0zii says: Don't worry, we'll try again! 🚀")
             
     print(f"❌ All {MAX_RETRIES} attempts failed. Last error: {str(last_error)}")
     raise last_error
@@ -126,7 +126,7 @@ async def create_chat_completion(request: dict):
 
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Starting MoonDev's DeepSeek API...")
+    print("🚀 Starting fr0zii's DeepSeek API...")
     print("🌟 Supported models:")
     for api_model, ollama_model in MODEL_MAPPING.items():
         print(f"  - {api_model} -> {ollama_model}")

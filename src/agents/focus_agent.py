@@ -6,7 +6,7 @@ This agent randomly monitors speech samples and provides focus assessments.
 """
 
 # Use local DeepSeek flag
-# available free while moon dev is streaming: https://www.youtube.com/@moondevonyt 
+# available free while fr0zii is streaming: https://www.youtube.com/@moondevonyt
 USE_LOCAL_DEEPSEEK = False  
 
 import sys
